@@ -1,0 +1,73 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: operator-inventory
+  namespace: spheron-services
+  labels:
+    akash.network: "true"
+    app.kubernetes.io/name: inventory
+    app.kubernetes.io/instance: inventory-service
+    app.kubernetes.io/component: operator
+    app.kubernetes.io/part-of: provider
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: inventory
+      app.kubernetes.io/instance: inventory-service
+      app.kubernetes.io/component: operator
+      app.kubernetes.io/part-of: provider
+  replicas: 1
+  revisionHistoryLimit: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: inventory
+        app.kubernetes.io/instance: inventory-service
+        app.kubernetes.io/component: operator
+        app.kubernetes.io/part-of: provider
+    spec:
+      serviceAccountName: operator-inventory
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: operator-inventory
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          args:
+            - "provider-services"
+            - "operator"
+            - "inventory"
+            - "--provider-configs-url"
+            - "{{ .Values.config.url }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: AP_CONFIG
+              value: /spheron/config.yaml
+            - name: AP_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: AP_POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 1024Mi
+            requests:
+              cpu: 500m
+              memory: 256Mi
+          ports:
+            - containerPort: 8080
+              name: rest
+              protocol: TCP
+            - containerPort: 8081
+              name: grpc
+              protocol: TCP
+          volumeMounts:
+            - name: config
+              mountPath: /spheron
+      volumes:
+        - name: config
+          configMap:
+            name: operator-inventory

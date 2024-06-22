@@ -1,0 +1,319 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "provider.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ include "provider.fullname" . }}
+    {{- include "provider.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  #strategy:
+  #  type: OnDelete
+  serviceName: {{ include "provider.fullname" . }}
+  selector:
+    matchLabels:
+      app: {{ include "provider.fullname" . }}
+      {{- include "provider.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/cm-scripts: {{ include (print $.Template.BasePath "/configmap-scripts.yaml") . | sha256sum }}
+      labels:
+        app: {{ include "provider.fullname" . }}
+        {{- include "provider.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "provider.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: init
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          command: ["/bin/bash", "/scripts/init.sh"]
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            - name: AKASH_DEBUG
+              value: "{{ $.Values.debug }}"
+            - name: AP_YES
+              value: "true"
+            ##
+            # boot config
+            ##
+
+            # location of key export. must contain two files:
+            #
+            # key.txt:      exported wallet key
+            # key-pass.txt: password used to encrypt exported key
+            - name: AKASH_BOOT_KEYS
+              value: "/boot-keys"
+
+            ##
+            # cosmos-sdk client config
+            ##
+            - name: AKASH_HOME
+              value: "{{ .Values.home }}"
+            - name: AKASH_FROM
+              value: "{{ .Values.from }}"
+            - name: AKASH_NODE
+              value: "{{ .Values.node }}"
+            - name: AKASH_CHAIN_ID
+              value: "{{ .Values.chainid }}"
+            - name: AKASH_KEYRING_BACKEND
+              value: "{{ .Values.keyringbackend }}"
+            - name: AKASH_BROADCAST_MODE
+              value: "block"
+            - name: AKASH_YES
+              value: "true"
+            - name: AKASH_GAS_PRICES
+              value: "{{ .Values.gasprices }}"
+            - name: AKASH_GAS
+              value: "{{ .Values.gas }}"
+            - name: AKASH_GAS_ADJUSTMENT
+              value: "{{ .Values.gasadjustment }}"
+            - name: AKASH_LOG_LEVEL
+              value: "info"
+
+          volumeMounts:
+            - name: scripts
+              mountPath: /scripts
+              readOnly: true
+            - name: keys
+              mountPath: /boot-keys
+              readOnly: true
+            - name: provider-config-volume
+              mountPath: /config
+            - name: home
+              mountPath: "{{ .Values.home }}"
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          command: ["/bin/bash", "/scripts/run.sh"]
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            - name: AKASH_DEBUG
+              value: "{{ $.Values.debug }}"
+            ##
+            # boot config
+            ##
+
+            # location of key export. must contain two files:
+            #
+            # key.txt:      exported wallet key
+            # key-pass.txt: password used to encrypt exported key
+            - name: AKASH_BOOT_KEYS
+              value: "/boot-keys"
+
+            ##
+            # cosmos-sdk client config
+            ##
+
+            - name: AKASH_HOME
+              value: "{{ .Values.home }}"
+            - name: AKASH_FROM
+              value: "{{ .Values.from }}"
+            - name: AKASH_NODE
+              value: "{{ .Values.node }}"
+            - name: AKASH_CHAIN_ID
+              value: "{{ .Values.chainid }}"
+            - name: AKASH_KEYRING_BACKEND
+              value: "{{ .Values.keyringbackend }}"
+            - name: AKASH_BROADCAST_MODE
+              value: "block"
+            - name: AKASH_VERSION
+              value: "{{ .Values.image.tag | default .Chart.AppVersion }}"
+            - name: AKASH_YES
+              value: "true"
+            - name: AKASH_LOG_LEVEL
+              value: "info"
+
+            ##
+            # spheron-provider ip operator config
+            ##
+
+            - name: AKASH_IP_OPERATOR
+              value: "{{ .Values.ipoperator }}"
+
+            ##
+            # spheron-provider config
+            ##
+
+            - name: AKASH_DEPLOYMENT_INGRESS_DOMAIN
+              value: "ingress.{{ .Values.domain }}"
+            - name: DEPLOYMENT_NETWORK_POLICIES_ENABLED
+              value: "{{ .Values.deploymentnetworkpoliciesenabled }}"
+            - name: AKASH_DEPLOYMENT_INGRESS_STATIC_HOSTS
+              value: "true"
+            - name: AKASH_DEPLOYMENT_BLOCKED_HOSTNAMES
+              value: ""
+            - name: AKASH_CLUSTER_NODE_PORT_QUANTITY
+              value: "{{ .Values.cluster_node_port_quantity }}"
+            - name: AKASH_GAS_PRICES
+              value: "{{ .Values.gasprices }}"
+            - name: AKASH_GAS
+              value: "{{ .Values.gas }}"
+            - name: AKASH_GAS_ADJUSTMENT
+              value: "{{ .Values.gasadjustment }}"
+            # AKASH_CLUSTER_PUBLIC_HOSTNAME need to stay as this makes to
+            # 'spheron provider lease-status` under the forwarded_ports (nodePorts).
+            # This is NOT used for connecting to K8s cluster itself (6443/tcp).
+            # spheron-provider uses kubeconfig to connect to K8s cluster.
+            - name: AKASH_CLUSTER_PUBLIC_HOSTNAME
+              value: "provider.{{ .Values.domain }}"
+            - name: AKASH_BID_PRICE_STRATEGY
+              value: "{{ .Values.bidpricestrategy }}"
+{{ if .Values.bidpricescript }}
+            - name: AKASH_BID_PRICE_SCRIPT_PATH
+              value: "/scripts/price_script.sh"
+{{- end }}
+{{ if .Values.whitelist_url }}
+            - name: WHITELIST_URL
+              value: "{{ .Values.whitelist_url }}"
+{{- end }}
+{{ if .Values.debug_bid_script }}
+            - name: DEBUG_BID_SCRIPT
+              value: "{{ .Values.debug_bid_script }}"
+{{- end }}
+{{ if .Values.price_target_cpu }}
+            - name: PRICE_TARGET_CPU
+              value: "{{ .Values.price_target_cpu }}"
+{{- end }}
+{{ if .Values.price_target_memory }}
+            - name: PRICE_TARGET_MEMORY
+              value: "{{ .Values.price_target_memory }}"
+{{- end }}
+{{ if .Values.price_target_hd_ephemeral }}
+            - name: PRICE_TARGET_HD_EPHEMERAL
+              value: "{{ .Values.price_target_hd_ephemeral }}"
+{{- end }}
+{{ if .Values.price_target_hd_pers_hdd }}
+            - name: PRICE_TARGET_HD_PERS_HDD
+              value: "{{ .Values.price_target_hd_pers_hdd }}"
+{{- end }}
+{{ if .Values.price_target_hd_pers_ssd }}
+            - name: PRICE_TARGET_HD_PERS_SSD
+              value: "{{ .Values.price_target_hd_pers_ssd }}"
+{{- end }}
+{{ if .Values.price_target_hd_pers_nvme }}
+            - name: PRICE_TARGET_HD_PERS_NVME
+              value: "{{ .Values.price_target_hd_pers_nvme }}"
+{{- end }}
+{{ if .Values.price_target_endpoint }}
+            - name: PRICE_TARGET_ENDPOINT
+              value: "{{ .Values.price_target_endpoint }}"
+{{- end }}
+{{ if .Values.price_target_ip }}
+            - name: PRICE_TARGET_IP
+              value: "{{ .Values.price_target_ip }}"
+{{- end }}
+{{ if .Values.price_target_gpu_mappings }}
+            - name: PRICE_TARGET_GPU_MAPPINGS
+              value: "{{ .Values.price_target_gpu_mappings }}"
+{{- end }}
+            - name: AKASH_BID_PRICE_CPU_SCALE
+              value: "{{ .Values.bidpricecpuscale }}"
+            - name: AKASH_BID_PRICE_MEMORY_SCALE
+              value: "{{ .Values.bidpricememoryscale }}"
+            - name: AKASH_BID_PRICE_ENDPOINT_SCALE
+              value: "{{ .Values.bidpricendpointscale }}"
+            - name: AKASH_BID_PRICE_STORAGE_SCALE
+              value: "{{ .Values.bidpricestoragescale }}"
+            - name: AKASH_BID_PRICE_IP_SCALE
+              value: "{{ .Values.bidpriceipscale }}"
+            - name: AKASH_OVERCOMMIT_PCT_CPU
+              value: "{{ .Values.overcommit_pct_cpu }}"
+            - name: AKASH_OVERCOMMIT_PCT_MEM
+              value: "{{ .Values.overcommit_pct_mem }}"
+            - name: AKASH_OVERCOMMIT_PCT_STORAGE
+              value: "{{ .Values.overcommit_pct_storage }}"
+            - name: AKASH_CLUSTER_K8S
+              value: "true"
+            - name: KUBE_CONFIG
+              value: "{{ .Values.home }}/.kube/config"
+            - name: AKASH_DEPLOYMENT_RUNTIME_CLASS
+              value: "none"
+            - name: AKASH_WITHDRAWAL_PERIOD
+              value: "{{ .Values.withdrawalperiod }}"
+            - name: AKASH_MINIMUM_BALANCE
+              value: "{{ .Values.minimumbalance }}"
+            - name: AKASH_BID_DEPOSIT
+              value: "{{ .Values.bidmindeposit }}"
+            - name: SPHERON_FROM
+              value: "{{ .Values.from}}" 
+            - name: SPHERON_KEY_SECRET
+              value: "{{ .Values.keysecret}}"                
+
+          ports:
+            - name: api
+              containerPort: 8443
+              protocol: TCP
+            - name: grpc
+              containerPort: 8444
+              protocol: TCP
+
+          livenessProbe:
+            exec:
+              command:
+              - sh
+              - -c
+              - /scripts/liveness_checks.sh
+            initialDelaySeconds: 240
+            periodSeconds: 30
+            failureThreshold: 1
+            timeoutSeconds: 30
+
+          volumeMounts:
+            - name: spheron-key
+              mountPath: /spheron-key
+              readOnly: true
+            - name: scripts
+              mountPath: /scripts
+              readOnly: true
+            - name: keys
+              mountPath: /boot-keys
+              readOnly: true
+            - name: provider-config-volume
+              mountPath: /config
+            - name: home
+              mountPath: "{{ .Values.home }}"
+      volumes:
+        - name: spheron-key
+          hostPath:
+            path: /home/spheron/.spheron
+            type: Directory
+        - name: scripts
+          configMap:
+            name: {{ include "provider.fullname" . }}-scripts
+            defaultMode: 0744
+        - name: keys
+          secret:
+            secretName: {{ include "provider.fullname" . }}-keys
+        - name: provider-config-volume
+          hostPath:
+            path: /root/.spheron/k8s-config
+            type: DirectoryOrCreate
+        - name: home
+          emptyDir: {}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
