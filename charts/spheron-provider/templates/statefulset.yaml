@@ -252,7 +252,9 @@ spec:
             - name: SPHERON_FROM
               value: "{{ .Values.from}}" 
             - name: SPHERON_KEY_SECRET
-              value: "{{ .Values.keysecret}}"                
+              value: "{{ .Values.keysecret}}"    
+            - name: SPHERON_HOME
+              value: "{{ .Values.home}}"                             
 
           ports:
             - name: api

@@ -19,7 +19,10 @@ type bc || exit 1
 # /scripts/refresh_provider_cert.sh
 
 # Start provider-services and monitor its output
-exec provider-services run --cluster-k8s --from=$SPHERON_FROM --key-secret=$SPHERON_KEY_SECRET --bid-price-strategy=shellScript --bid-price-script-path=/scripts/price_script.sh | while read line; do
+echo "wallet: $SPHERON_FROM"
+echo "home: $SPHERON_HOME"
+echo "secret: $SPHERON_KEY_SECRET" ## TODO: Remove this not good for data compliance
+exec provider-services run --cluster-k8s --from=$SPHERON_FROM --home=$SPHERON_HOME --key-secret=$SPHERON_KEY_SECRET --bid-price-strategy=shellScript --bid-price-script-path=/scripts/price_script.sh | while read line; do
     echo "$line"
     if [[ "$line" == *"account sequence mismatch"* ]]; then
         echo "Pattern 'account sequence mismatch' found. Restarting provider-services..."
