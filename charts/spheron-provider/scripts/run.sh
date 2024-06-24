@@ -31,7 +31,7 @@ exec provider-services run \
     --bid-price-script-path=$SPHERON_BID_PRICE_SCRIPT_PATH \
     --deployment-ingress-static-hosts=$SPHERON_DEPLOYMENT_INGRESS_STATIC_HOSTS \
     --deployment-ingress-domain=$SPHERON_DEPLOYMENT_INGRESS_DOMAIN \
-    --cluster_node_port_quantity=$SPHERON_CLUSTER_NODE_PORT_QUANTITY \
+    --cluster-node-port-quantity=$SPHERON_CLUSTER_NODE_PORT_QUANTITY \
     --cluster-public-hostname=$SPHERON_CLUSTER_PUBLIC_HOSTNAME \
     --deployment-runtime-class=$SPHERON_DEPLOYMENT_RUNTIME_CLASS \
     | while read line; do
