@@ -12,6 +12,7 @@ key:
 keysecret:
 chainid: spheronnet-2
 domain:
+spheronHome: "/spheron-key"
 home: "/root/.spheron"
 node: "https://spheron-rpc.polkachu.com:443"
 keyringbackend: "test"

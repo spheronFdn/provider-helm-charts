@@ -254,7 +254,7 @@ spec:
             - name: SPHERON_KEY_SECRET
               value: "{{ .Values.keysecret}}"    
             - name: SPHERON_HOME
-              value: "{{ .Values.home}}"                             
+              value: "{{ .Values.spheronHome}}"                             
 
           ports:
             - name: api
