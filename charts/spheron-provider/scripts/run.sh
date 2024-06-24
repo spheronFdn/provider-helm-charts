@@ -22,7 +22,19 @@ type bc || exit 1
 echo "wallet: $SPHERON_FROM"
 echo "home: $SPHERON_HOME"
 echo "secret: $SPHERON_KEY_SECRET" ## TODO: Remove this not good for data compliance
-exec provider-services run --cluster-k8s --from=$SPHERON_FROM --home=$SPHERON_HOME --key-secret=$SPHERON_KEY_SECRET --bid-price-strategy=shellScript --bid-price-script-path=/scripts/price_script.sh | while read line; do
+exec provider-services run \
+    --cluster-k8s \
+    --from=$SPHERON_FROM \
+    --home=$SPHERON_HOME \
+    --key-secret=$SPHERON_KEY_SECRET \
+    --bid-price-strategy=$SPHERON_BID_PRICE_STRATEGY \
+    --bid-price-script-path=$SPHERON_BID_PRICE_SCRIPT_PATH \
+    --deployment-ingress-static-hosts=$SPHERON_DEPLOYMENT_INGRESS_STATIC_HOSTS \
+    --deployment-ingress-domain=$SPHERON_DEPLOYMENT_INGRESS_DOMAIN \
+    --cluster_node_port_quantity=$SPHERON_CLUSTER_NODE_PORT_QUANTITY \
+    --cluster-public-hostname=$SPHERON_CLUSTER_PUBLIC_HOSTNAME \
+    --deployment-runtime-class=$SPHERON_DEPLOYMENT_RUNTIME_CLASS \
+    | while read line; do
     echo "$line"
     if [[ "$line" == *"account sequence mismatch"* ]]; then
         echo "Pattern 'account sequence mismatch' found. Restarting provider-services..."

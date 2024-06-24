@@ -58,26 +58,6 @@ spec:
             ##
             # cosmos-sdk client config
             ##
-            - name: AKASH_HOME
-              value: "{{ .Values.home }}"
-            - name: AKASH_FROM
-              value: "{{ .Values.from }}"
-            - name: AKASH_NODE
-              value: "{{ .Values.node }}"
-            - name: AKASH_CHAIN_ID
-              value: "{{ .Values.chainid }}"
-            - name: AKASH_KEYRING_BACKEND
-              value: "{{ .Values.keyringbackend }}"
-            - name: AKASH_BROADCAST_MODE
-              value: "block"
-            - name: AKASH_YES
-              value: "true"
-            - name: AKASH_GAS_PRICES
-              value: "{{ .Values.gasprices }}"
-            - name: AKASH_GAS
-              value: "{{ .Values.gas }}"
-            - name: AKASH_GAS_ADJUSTMENT
-              value: "{{ .Values.gasadjustment }}"
             - name: AKASH_LOG_LEVEL
               value: "info"
 
@@ -119,20 +99,6 @@ spec:
             # cosmos-sdk client config
             ##
 
-            - name: AKASH_HOME
-              value: "{{ .Values.home }}"
-            - name: AKASH_FROM
-              value: "{{ .Values.from }}"
-            - name: AKASH_NODE
-              value: "{{ .Values.node }}"
-            - name: AKASH_CHAIN_ID
-              value: "{{ .Values.chainid }}"
-            - name: AKASH_KEYRING_BACKEND
-              value: "{{ .Values.keyringbackend }}"
-            - name: AKASH_BROADCAST_MODE
-              value: "block"
-            - name: AKASH_VERSION
-              value: "{{ .Values.image.tag | default .Chart.AppVersion }}"
             - name: AKASH_YES
               value: "true"
             - name: AKASH_LOG_LEVEL
@@ -149,32 +115,27 @@ spec:
             # spheron-provider config
             ##
 
-            - name: AKASH_DEPLOYMENT_INGRESS_DOMAIN
+            - name: SPHERON_DEPLOYMENT_INGRESS_DOMAIN
               value: "ingress.{{ .Values.domain }}"
             - name: DEPLOYMENT_NETWORK_POLICIES_ENABLED
               value: "{{ .Values.deploymentnetworkpoliciesenabled }}"
-            - name: AKASH_DEPLOYMENT_INGRESS_STATIC_HOSTS
+            - name: SPHERON_DEPLOYMENT_INGRESS_STATIC_HOSTS
               value: "true"
             - name: AKASH_DEPLOYMENT_BLOCKED_HOSTNAMES
               value: ""
-            - name: AKASH_CLUSTER_NODE_PORT_QUANTITY
+            - name: SPHERON_CLUSTER_NODE_PORT_QUANTITY
               value: "{{ .Values.cluster_node_port_quantity }}"
-            - name: AKASH_GAS_PRICES
-              value: "{{ .Values.gasprices }}"
-            - name: AKASH_GAS
-              value: "{{ .Values.gas }}"
-            - name: AKASH_GAS_ADJUSTMENT
-              value: "{{ .Values.gasadjustment }}"
+
             # AKASH_CLUSTER_PUBLIC_HOSTNAME need to stay as this makes to
             # 'spheron provider lease-status` under the forwarded_ports (nodePorts).
             # This is NOT used for connecting to K8s cluster itself (6443/tcp).
             # spheron-provider uses kubeconfig to connect to K8s cluster.
-            - name: AKASH_CLUSTER_PUBLIC_HOSTNAME
+            - name: SPHERON_CLUSTER_PUBLIC_HOSTNAME
               value: "provider.{{ .Values.domain }}"
-            - name: AKASH_BID_PRICE_STRATEGY
+            - name: SPHERON_BID_PRICE_STRATEGY
               value: "{{ .Values.bidpricestrategy }}"
 {{ if .Values.bidpricescript }}
-            - name: AKASH_BID_PRICE_SCRIPT_PATH
+            - name: SPHERON_BID_PRICE_SCRIPT_PATH
               value: "/scripts/price_script.sh"
 {{- end }}
 {{ if .Values.whitelist_url }}
@@ -237,18 +198,12 @@ spec:
               value: "{{ .Values.overcommit_pct_mem }}"
             - name: AKASH_OVERCOMMIT_PCT_STORAGE
               value: "{{ .Values.overcommit_pct_storage }}"
-            - name: AKASH_CLUSTER_K8S
+            - name: SPHERON_CLUSTER_K8S
               value: "true"
             - name: KUBE_CONFIG
               value: "{{ .Values.home }}/.kube/config"
-            - name: AKASH_DEPLOYMENT_RUNTIME_CLASS
+            - name: SPHERON_DEPLOYMENT_RUNTIME_CLASS
               value: "none"
-            - name: AKASH_WITHDRAWAL_PERIOD
-              value: "{{ .Values.withdrawalperiod }}"
-            - name: AKASH_MINIMUM_BALANCE
-              value: "{{ .Values.minimumbalance }}"
-            - name: AKASH_BID_DEPOSIT
-              value: "{{ .Values.bidmindeposit }}"
             - name: SPHERON_FROM
               value: "{{ .Values.from}}" 
             - name: SPHERON_KEY_SECRET
