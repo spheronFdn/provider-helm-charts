@@ -30,48 +30,6 @@ spec:
       serviceAccountName: {{ include "provider.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      # initContainers:
-      #   - name: init
-      #     securityContext:
-      #       {{- toYaml .Values.securityContext | nindent 12 }}
-      #     image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-      #     command: ["/bin/bash", "/scripts/init.sh"]
-      #     imagePullPolicy: {{ .Values.image.pullPolicy }}
-      #     resources:
-      #       {{- toYaml .Values.resources | nindent 12 }}
-      #     env:
-      #       - name: AKASH_DEBUG
-      #         value: "{{ $.Values.debug }}"
-      #       - name: AP_YES
-      #         value: "true"
-      #       ##
-      #       # boot config
-      #       ##
-
-      #       # location of key export. must contain two files:
-      #       #
-      #       # key.txt:      exported wallet key
-      #       # key-pass.txt: password used to encrypt exported key
-      #       - name: AKASH_BOOT_KEYS
-      #         value: "/boot-keys"
-
-      #       ##
-      #       # cosmos-sdk client config
-      #       ##
-      #       - name: AKASH_LOG_LEVEL
-      #         value: "info"
-
-      #     volumeMounts:
-      #       - name: scripts
-      #         mountPath: /scripts
-      #         readOnly: true
-      #       - name: keys
-      #         mountPath: /boot-keys
-      #         readOnly: true
-      #       - name: provider-config-volume
-      #         mountPath: /config
-      #       - name: home
-      #         mountPath: "{{ .Values.home }}"
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
