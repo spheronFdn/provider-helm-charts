@@ -30,68 +30,6 @@ spec:
       serviceAccountName: {{ include "provider.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      initContainers:
-        - name: init
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          command: ["/bin/bash", "/scripts/init.sh"]
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-          env:
-            - name: AKASH_DEBUG
-              value: "{{ $.Values.debug }}"
-            - name: AP_YES
-              value: "true"
-            ##
-            # boot config
-            ##
-
-            # location of key export. must contain two files:
-            #
-            # key.txt:      exported wallet key
-            # key-pass.txt: password used to encrypt exported key
-            - name: AKASH_BOOT_KEYS
-              value: "/boot-keys"
-
-            ##
-            # cosmos-sdk client config
-            ##
-            - name: AKASH_HOME
-              value: "{{ .Values.home }}"
-            - name: AKASH_FROM
-              value: "{{ .Values.from }}"
-            - name: AKASH_NODE
-              value: "{{ .Values.node }}"
-            - name: AKASH_CHAIN_ID
-              value: "{{ .Values.chainid }}"
-            - name: AKASH_KEYRING_BACKEND
-              value: "{{ .Values.keyringbackend }}"
-            - name: AKASH_BROADCAST_MODE
-              value: "block"
-            - name: AKASH_YES
-              value: "true"
-            - name: AKASH_GAS_PRICES
-              value: "{{ .Values.gasprices }}"
-            - name: AKASH_GAS
-              value: "{{ .Values.gas }}"
-            - name: AKASH_GAS_ADJUSTMENT
-              value: "{{ .Values.gasadjustment }}"
-            - name: AKASH_LOG_LEVEL
-              value: "info"
-
-          volumeMounts:
-            - name: scripts
-              mountPath: /scripts
-              readOnly: true
-            - name: keys
-              mountPath: /boot-keys
-              readOnly: true
-            - name: provider-config-volume
-              mountPath: /config
-            - name: home
-              mountPath: "{{ .Values.home }}"
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -104,37 +42,8 @@ spec:
           env:
             - name: AKASH_DEBUG
               value: "{{ $.Values.debug }}"
-            ##
-            # boot config
-            ##
-
-            # location of key export. must contain two files:
-            #
-            # key.txt:      exported wallet key
-            # key-pass.txt: password used to encrypt exported key
-            - name: AKASH_BOOT_KEYS
-              value: "/boot-keys"
-
-            ##
-            # cosmos-sdk client config
-            ##
-
-            - name: AKASH_HOME
-              value: "{{ .Values.home }}"
-            - name: AKASH_FROM
-              value: "{{ .Values.from }}"
-            - name: AKASH_NODE
-              value: "{{ .Values.node }}"
-            - name: AKASH_CHAIN_ID
-              value: "{{ .Values.chainid }}"
-            - name: AKASH_KEYRING_BACKEND
-              value: "{{ .Values.keyringbackend }}"
-            - name: AKASH_BROADCAST_MODE
-              value: "block"
-            - name: AKASH_VERSION
-              value: "{{ .Values.image.tag | default .Chart.AppVersion }}"
-            - name: AKASH_YES
-              value: "true"
+            - name: AP_YES
+              value: "true"              
             - name: AKASH_LOG_LEVEL
               value: "info"
 
@@ -142,39 +51,34 @@ spec:
             # spheron-provider ip operator config
             ##
 
-            - name: AKASH_IP_OPERATOR
+            - name: SPHERON_IP_OPERATOR
               value: "{{ .Values.ipoperator }}"
 
             ##
             # spheron-provider config
             ##
 
-            - name: AKASH_DEPLOYMENT_INGRESS_DOMAIN
+            - name: SPHERON_DEPLOYMENT_INGRESS_DOMAIN
               value: "ingress.{{ .Values.domain }}"
             - name: DEPLOYMENT_NETWORK_POLICIES_ENABLED
               value: "{{ .Values.deploymentnetworkpoliciesenabled }}"
-            - name: AKASH_DEPLOYMENT_INGRESS_STATIC_HOSTS
+            - name: SPHERON_DEPLOYMENT_INGRESS_STATIC_HOSTS
               value: "true"
-            - name: AKASH_DEPLOYMENT_BLOCKED_HOSTNAMES
+            - name: SPHERON_DEPLOYMENT_BLOCKED_HOSTNAMES
               value: ""
-            - name: AKASH_CLUSTER_NODE_PORT_QUANTITY
+            - name: SPHERON_CLUSTER_NODE_PORT_QUANTITY
               value: "{{ .Values.cluster_node_port_quantity }}"
-            - name: AKASH_GAS_PRICES
-              value: "{{ .Values.gasprices }}"
-            - name: AKASH_GAS
-              value: "{{ .Values.gas }}"
-            - name: AKASH_GAS_ADJUSTMENT
-              value: "{{ .Values.gasadjustment }}"
+
             # AKASH_CLUSTER_PUBLIC_HOSTNAME need to stay as this makes to
             # 'spheron provider lease-status` under the forwarded_ports (nodePorts).
             # This is NOT used for connecting to K8s cluster itself (6443/tcp).
             # spheron-provider uses kubeconfig to connect to K8s cluster.
-            - name: AKASH_CLUSTER_PUBLIC_HOSTNAME
+            - name: SPHERON_CLUSTER_PUBLIC_HOSTNAME
               value: "provider.{{ .Values.domain }}"
-            - name: AKASH_BID_PRICE_STRATEGY
+            - name: SPHERON_BID_PRICE_STRATEGY
               value: "{{ .Values.bidpricestrategy }}"
 {{ if .Values.bidpricescript }}
-            - name: AKASH_BID_PRICE_SCRIPT_PATH
+            - name: SPHERON_BID_PRICE_SCRIPT_PATH
               value: "/scripts/price_script.sh"
 {{- end }}
 {{ if .Values.whitelist_url }}
@@ -221,34 +125,28 @@ spec:
             - name: PRICE_TARGET_GPU_MAPPINGS
               value: "{{ .Values.price_target_gpu_mappings }}"
 {{- end }}
-            - name: AKASH_BID_PRICE_CPU_SCALE
+            - name: SPHERON_BID_PRICE_CPU_SCALE
               value: "{{ .Values.bidpricecpuscale }}"
-            - name: AKASH_BID_PRICE_MEMORY_SCALE
+            - name: SPHERON_BID_PRICE_MEMORY_SCALE
               value: "{{ .Values.bidpricememoryscale }}"
-            - name: AKASH_BID_PRICE_ENDPOINT_SCALE
+            - name: SPHERON_BID_PRICE_ENDPOINT_SCALE
               value: "{{ .Values.bidpricendpointscale }}"
-            - name: AKASH_BID_PRICE_STORAGE_SCALE
+            - name: SPHERON_BID_PRICE_STORAGE_SCALE
               value: "{{ .Values.bidpricestoragescale }}"
-            - name: AKASH_BID_PRICE_IP_SCALE
+            - name: SPHERON_BID_PRICE_IP_SCALE
               value: "{{ .Values.bidpriceipscale }}"
-            - name: AKASH_OVERCOMMIT_PCT_CPU
+            - name: SPHERON_OVERCOMMIT_PCT_CPU
               value: "{{ .Values.overcommit_pct_cpu }}"
-            - name: AKASH_OVERCOMMIT_PCT_MEM
+            - name: SPHERON_OVERCOMMIT_PCT_MEM
               value: "{{ .Values.overcommit_pct_mem }}"
-            - name: AKASH_OVERCOMMIT_PCT_STORAGE
+            - name: SPHERON_OVERCOMMIT_PCT_STORAGE
               value: "{{ .Values.overcommit_pct_storage }}"
-            - name: AKASH_CLUSTER_K8S
+            - name: SPHERON_CLUSTER_K8S
               value: "true"
             - name: KUBE_CONFIG
               value: "{{ .Values.home }}/.kube/config"
-            - name: AKASH_DEPLOYMENT_RUNTIME_CLASS
+            - name: SPHERON_DEPLOYMENT_RUNTIME_CLASS
               value: "none"
-            - name: AKASH_WITHDRAWAL_PERIOD
-              value: "{{ .Values.withdrawalperiod }}"
-            - name: AKASH_MINIMUM_BALANCE
-              value: "{{ .Values.minimumbalance }}"
-            - name: AKASH_BID_DEPOSIT
-              value: "{{ .Values.bidmindeposit }}"
             - name: SPHERON_FROM
               value: "{{ .Values.from}}" 
             - name: SPHERON_KEY_SECRET
@@ -264,26 +162,12 @@ spec:
               containerPort: 8444
               protocol: TCP
 
-          livenessProbe:
-            exec:
-              command:
-              - sh
-              - -c
-              - /scripts/liveness_checks.sh
-            initialDelaySeconds: 240
-            periodSeconds: 30
-            failureThreshold: 1
-            timeoutSeconds: 30
-
           volumeMounts:
             - name: spheron-key
               mountPath: /spheron-key
               readOnly: true
             - name: scripts
               mountPath: /scripts
-              readOnly: true
-            - name: keys
-              mountPath: /boot-keys
               readOnly: true
             - name: provider-config-volume
               mountPath: /config
@@ -298,9 +182,6 @@ spec:
           configMap:
             name: {{ include "provider.fullname" . }}-scripts
             defaultMode: 0744
-        - name: keys
-          secret:
-            secretName: {{ include "provider.fullname" . }}-keys
         - name: provider-config-volume
           hostPath:
             path: /root/.spheron/k8s-config
