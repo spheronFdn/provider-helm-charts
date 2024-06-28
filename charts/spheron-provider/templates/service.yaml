@@ -4,7 +4,7 @@ metadata:
   name: {{ include "provider.fullname" . }}
   namespace: {{ .Release.Namespace }}
   labels:
-    akash.network: "true"
+    spheron.network: "true"
     app.kubernetes.io/name: spheron
     app.kubernetes.io/instance: inventory
     app.kubernetes.io/component: operator

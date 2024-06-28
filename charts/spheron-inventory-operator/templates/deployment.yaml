@@ -5,7 +5,7 @@ metadata:
   name: operator-inventory
   namespace: spheron-services
   labels:
-    akash.network: "true"
+    spheron.network: "true"
     app.kubernetes.io/name: inventory
     app.kubernetes.io/instance: inventory-service
     app.kubernetes.io/component: operator

@@ -40,11 +40,11 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
-            - name: AKASH_DEBUG
+            - name: SPHERON_DEBUG
               value: "{{ $.Values.debug }}"
             - name: AP_YES
               value: "true"              
-            - name: AKASH_LOG_LEVEL
+            - name: SPHERON_LOG_LEVEL
               value: "info"
 
             ##
@@ -69,7 +69,7 @@ spec:
             - name: SPHERON_CLUSTER_NODE_PORT_QUANTITY
               value: "{{ .Values.cluster_node_port_quantity }}"
 
-            # AKASH_CLUSTER_PUBLIC_HOSTNAME need to stay as this makes to
+            # SPHERON_CLUSTER_PUBLIC_HOSTNAME need to stay as this makes to
             # 'spheron provider lease-status` under the forwarded_ports (nodePorts).
             # This is NOT used for connecting to K8s cluster itself (6443/tcp).
             # spheron-provider uses kubeconfig to connect to K8s cluster.

@@ -4,7 +4,7 @@ kind: ClusterRole
 metadata:
   name: spheron-operator-inventory
   labels:
-    akash.network: "true"
+    spheron.network: "true"
     app.kubernetes.io/name: inventory
     app.kubernetes.io/instance: inventory-service
     app.kubernetes.io/component: operator
@@ -73,7 +73,7 @@ rules:
       - list
       - watch
   - apiGroups:
-      - akash.network
+      - spheron.network
     resources:
       - inventoryrequests
     verbs:
@@ -81,7 +81,7 @@ rules:
       - list
       - watch
   - apiGroups:
-      - akash.network
+      - spheron.network
     resources:
       - inventories
     verbs:
@@ -96,7 +96,7 @@ kind: ClusterRole
 metadata:
   name: spheron-operator-inventory-hardware-discovery
   labels:
-    akash.network: "true"
+    spheron.network: "true"
     app.kubernetes.io/name: inventory
     app.kubernetes.io/instance: inventory-hardware-discovery
     app.kubernetes.io/component: operator
