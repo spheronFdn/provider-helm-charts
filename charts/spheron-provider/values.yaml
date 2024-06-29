@@ -5,7 +5,7 @@
 image:
   repository: spheronnetwork/devnet-provider
   pullPolicy: Always
-  tag: latest-amd64
+  tag: spheron-amd64
 
 from:
 key:
@@ -19,7 +19,7 @@ email:
 website:
 
 # If you plan to use bid price script, then make sure to set bidpricescript variable to the base64 encoded contents of the script.
-# This will automatically switch AKASH_BID_PRICE_STRATEGY from "scale" (default) to "shellScript".
+# This will automatically switch SPHERON_BID_PRICE_STRATEGY from "scale" (default) to "shellScript".
 # Sample scripts can be found under charts/spheron-provider/scripts/ directory.
 # Example usage:
 # --set bidpricescript="$(cat ./charts/spheron-provider/scripts/price_script_generic.sh | openssl base64 -A)"

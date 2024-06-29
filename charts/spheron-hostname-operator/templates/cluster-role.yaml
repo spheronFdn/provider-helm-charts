@@ -29,7 +29,7 @@ rules:
     verbs:
       - get
   - apiGroups:
-      - akash.network
+      - spheron.network
     resources:
       - providerhosts
       - manifests

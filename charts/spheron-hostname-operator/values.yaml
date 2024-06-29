@@ -7,7 +7,7 @@ replicaCount: 1
 image:
   repository: spheronnetwork/devnet-provider
   pullPolicy: Always
-  tag: latest-amd64
+  tag: spheron-amd64
 
 imagePullSecrets: []
 nameOverride: ""

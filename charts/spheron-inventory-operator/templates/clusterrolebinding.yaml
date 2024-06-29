@@ -4,7 +4,7 @@ kind: ClusterRoleBinding
 metadata:
   name: operator-inventory
   labels:
-    akash.network: "true"
+    spheron.network: "true"
     app.kubernetes.io/name: inventory
     app.kubernetes.io/instance: inventory-service
     app.kubernetes.io/component: operator
@@ -23,7 +23,7 @@ kind: ClusterRoleBinding
 metadata:
   name: operator-inventory-hardware-discovery
   labels:
-    akash.network: "true"
+    spheron.network: "true"
     app.kubernetes.io/name: inventory
     app.kubernetes.io/instance: inventory-hardware-discovery
     app.kubernetes.io/component: operator

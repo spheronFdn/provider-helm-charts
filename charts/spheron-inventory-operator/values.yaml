@@ -5,7 +5,7 @@
 image:
   repository: spheronnetwork/devnet-provider
   pullPolicy: Always
-  tag: latest-amd64
+  tag: spheron-amd64
 
 inventoryConfig:
   # Allow users to specify cluster storage options
