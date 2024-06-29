@@ -5,7 +5,7 @@
 image:
   repository: spheronnetwork/devnet-provider
   pullPolicy: Always
-  tag: spheron-amd64
+  tag: latest-amd64
 
 from:
 key:
