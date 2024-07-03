@@ -28,6 +28,12 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           ports:
             - containerPort: {{ .Values.config.port }}
+              name: srv
+            - containerPort: 8081
+              name: ws
+          hostNetwork: true    
+          securityContext:
+            privileged: true      
           envFrom:
             - configMapRef:
                 name: {{ .Values.name }}-config-map
