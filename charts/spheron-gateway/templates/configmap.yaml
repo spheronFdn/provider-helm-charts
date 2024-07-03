@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.name }}-config-map
+  namespace: {{ .Values.namespace }}
+data:
+  HOST: "{{ .Values.config.host }}"
+  PORT: "{{ .Values.config.port }}"
