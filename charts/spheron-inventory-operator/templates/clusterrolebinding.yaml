@@ -36,3 +36,22 @@ subjects:
   - kind: ServiceAccount
     name: operator-inventory-hardware-discovery
     namespace: spheron-services
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: operator-inventory-challenge-solver
+  labels:
+    spheron.network: "true"
+    app.kubernetes.io/name: inventory
+    app.kubernetes.io/instance: inventory-challenge-solver
+    app.kubernetes.io/component: operator
+    app.kubernetes.io/part-of: provider
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: spheron-operator-inventory-challenge-solver
+subjects:
+  - kind: ServiceAccount
+    name: operator-inventory-challenge-solver
+    namespace: spheron-services

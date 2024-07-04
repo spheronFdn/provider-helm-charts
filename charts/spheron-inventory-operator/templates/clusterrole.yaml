@@ -11,7 +11,7 @@ metadata:
     app.kubernetes.io/part-of: provider
 rules:
   - apiGroups:
-      - ''
+      - ""
     resources:
       - namespaces
       - nodes
@@ -24,13 +24,13 @@ rules:
       - list
       - watch
   - apiGroups:
-      - ''
+      - ""
     resources:
       - nodes
     verbs:
       - patch
   - apiGroups:
-      - ''
+      - ""
     resources:
       - pods
     verbs:
@@ -40,7 +40,7 @@ rules:
       - list
       - watch
   - apiGroups:
-      - ''
+      - ""
     resources:
       - pods/exec
     verbs:
@@ -50,7 +50,7 @@ rules:
       - list
       - watch
   - apiGroups:
-      - ''
+      - ""
     resources:
       - pods/proxy
     verbs:
@@ -103,7 +103,7 @@ metadata:
     app.kubernetes.io/part-of: provider
 rules:
   - apiGroups:
-      - ''
+      - ""
     resources:
       - nodes
     verbs:
@@ -111,7 +111,35 @@ rules:
       - list
       - watch
   - apiGroups:
-      - ''
+      - ""
+    resources:
+      - pods
+    verbs:
+      - get
+      - list
+      - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: akash-operator-inventory-challenge-solver
+  labels:
+    spheron.network: "true"
+    app.kubernetes.io/name: inventory
+    app.kubernetes.io/instance: inventory-challenge-solver
+    app.kubernetes.io/component: operator
+    app.kubernetes.io/part-of: provider
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - nodes
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
     resources:
       - pods
     verbs:
