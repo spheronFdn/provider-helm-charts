@@ -55,6 +55,7 @@ rules:
       - pods/proxy
     verbs:
       - get
+      - create
   - apiGroups:
       - storage.k8s.io
     resources:
