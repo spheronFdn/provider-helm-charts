@@ -1,0 +1,202 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "provider.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ include "provider.fullname" . }}
+    {{- include "provider.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  #strategy:
+  #  type: OnDelete
+  serviceName: {{ include "provider.fullname" . }}
+  selector:
+    matchLabels:
+      app: {{ include "provider.fullname" . }}
+      {{- include "provider.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/cm-scripts: {{ include (print $.Template.BasePath "/configmap-scripts.yaml") . | sha256sum }}
+      labels:
+        app: {{ include "provider.fullname" . }}
+        {{- include "provider.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "provider.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          command: ["/bin/bash", "/scripts/run.sh"]
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            - name: SPHERON_DEBUG
+              value: "{{ $.Values.debug }}"
+            - name: AP_YES
+              value: "true"              
+            - name: SPHERON_LOG_LEVEL
+              value: "info"
+
+            ##
+            # spheron-provider ip operator config
+            ##
+
+            - name: SPHERON_IP_OPERATOR
+              value: "{{ .Values.ipoperator }}"
+
+            ##
+            # spheron-provider config
+            ##
+
+            - name: SPHERON_DEPLOYMENT_INGRESS_DOMAIN
+              value: "ingress.{{ .Values.domain }}"
+            - name: DEPLOYMENT_NETWORK_POLICIES_ENABLED
+              value: "{{ .Values.deploymentnetworkpoliciesenabled }}"
+            - name: SPHERON_DEPLOYMENT_INGRESS_STATIC_HOSTS
+              value: "true"
+            - name: SPHERON_DEPLOYMENT_BLOCKED_HOSTNAMES
+              value: ""
+            - name: SPHERON_CLUSTER_NODE_PORT_QUANTITY
+              value: "{{ .Values.cluster_node_port_quantity }}"
+
+            # SPHERON_CLUSTER_PUBLIC_HOSTNAME need to stay as this makes to
+            # 'spheron provider lease-status` under the forwarded_ports (nodePorts).
+            # This is NOT used for connecting to K8s cluster itself (6443/tcp).
+            # spheron-provider uses kubeconfig to connect to K8s cluster.
+            - name: SPHERON_CLUSTER_PUBLIC_HOSTNAME
+              value: "provider.{{ .Values.domain }}"
+            - name: SPHERON_BID_PRICE_STRATEGY
+              value: "{{ .Values.bidpricestrategy }}"
+{{ if .Values.bidpricescript }}
+            - name: SPHERON_BID_PRICE_SCRIPT_PATH
+              value: "/scripts/price_script.sh"
+{{- end }}
+{{ if .Values.whitelist_url }}
+            - name: WHITELIST_URL
+              value: "{{ .Values.whitelist_url }}"
+{{- end }}
+{{ if .Values.debug_bid_script }}
+            - name: DEBUG_BID_SCRIPT
+              value: "{{ .Values.debug_bid_script }}"
+{{- end }}
+{{ if .Values.price_target_cpu }}
+            - name: PRICE_TARGET_CPU
+              value: "{{ .Values.price_target_cpu }}"
+{{- end }}
+{{ if .Values.price_target_memory }}
+            - name: PRICE_TARGET_MEMORY
+              value: "{{ .Values.price_target_memory }}"
+{{- end }}
+{{ if .Values.price_target_hd_ephemeral }}
+            - name: PRICE_TARGET_HD_EPHEMERAL
+              value: "{{ .Values.price_target_hd_ephemeral }}"
+{{- end }}
+{{ if .Values.price_target_hd_pers_hdd }}
+            - name: PRICE_TARGET_HD_PERS_HDD
+              value: "{{ .Values.price_target_hd_pers_hdd }}"
+{{- end }}
+{{ if .Values.price_target_hd_pers_ssd }}
+            - name: PRICE_TARGET_HD_PERS_SSD
+              value: "{{ .Values.price_target_hd_pers_ssd }}"
+{{- end }}
+{{ if .Values.price_target_hd_pers_nvme }}
+            - name: PRICE_TARGET_HD_PERS_NVME
+              value: "{{ .Values.price_target_hd_pers_nvme }}"
+{{- end }}
+{{ if .Values.price_target_endpoint }}
+            - name: PRICE_TARGET_ENDPOINT
+              value: "{{ .Values.price_target_endpoint }}"
+{{- end }}
+{{ if .Values.price_target_ip }}
+            - name: PRICE_TARGET_IP
+              value: "{{ .Values.price_target_ip }}"
+{{- end }}
+{{ if .Values.price_target_gpu_mappings }}
+            - name: PRICE_TARGET_GPU_MAPPINGS
+              value: "{{ .Values.price_target_gpu_mappings }}"
+{{- end }}
+            - name: SPHERON_BID_PRICE_CPU_SCALE
+              value: "{{ .Values.bidpricecpuscale }}"
+            - name: SPHERON_BID_PRICE_MEMORY_SCALE
+              value: "{{ .Values.bidpricememoryscale }}"
+            - name: SPHERON_BID_PRICE_ENDPOINT_SCALE
+              value: "{{ .Values.bidpricendpointscale }}"
+            - name: SPHERON_BID_PRICE_STORAGE_SCALE
+              value: "{{ .Values.bidpricestoragescale }}"
+            - name: SPHERON_BID_PRICE_IP_SCALE
+              value: "{{ .Values.bidpriceipscale }}"
+            - name: SPHERON_OVERCOMMIT_PCT_CPU
+              value: "{{ .Values.overcommit_pct_cpu }}"
+            - name: SPHERON_OVERCOMMIT_PCT_MEM
+              value: "{{ .Values.overcommit_pct_mem }}"
+            - name: SPHERON_OVERCOMMIT_PCT_STORAGE
+              value: "{{ .Values.overcommit_pct_storage }}"
+            - name: SPHERON_CLUSTER_K8S
+              value: "true"
+            - name: KUBE_CONFIG
+              value: "{{ .Values.home }}/.kube/config"
+            - name: SPHERON_DEPLOYMENT_RUNTIME_CLASS
+              value: "none"
+            - name: SPHERON_FROM
+              value: "{{ .Values.from}}" 
+            - name: SPHERON_KEY_SECRET
+              value: "{{ .Values.keysecret}}"    
+            - name: SPHERON_HOME
+              value: "{{ .Values.spheronHome}}"                             
+
+          ports:
+            - name: api
+              containerPort: 8443
+              protocol: TCP
+            - name: grpc
+              containerPort: 8444
+              protocol: TCP
+
+          volumeMounts:
+            - name: spheron-key
+              mountPath: /spheron-key
+              readOnly: true
+            - name: scripts
+              mountPath: /scripts
+              readOnly: true
+            - name: provider-config-volume
+              mountPath: /config
+            - name: home
+              mountPath: "{{ .Values.home }}"
+      volumes:
+        - name: spheron-key
+          hostPath:
+            path: /home/spheron/.spheron
+            type: Directory
+        - name: scripts
+          configMap:
+            name: {{ include "provider.fullname" . }}-scripts
+            defaultMode: 0744
+        - name: provider-config-volume
+          hostPath:
+            path: /root/.spheron/k8s-config
+            type: DirectoryOrCreate
+        - name: home
+          emptyDir: {}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
