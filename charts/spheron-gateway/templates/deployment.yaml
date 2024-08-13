@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: {{ .Values.name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.name }}
+    spec:
+      hostNetwork: true
+      nodeSelector:
+        node-role.kubernetes.io/master: "true"
+      tolerations:
+        - key: "node-role.kubernetes.io/master"
+          operator: "Equal"
+          value: "true"
+          effect: "NoSchedule"  
+      containers:
+        - name: {{ .Values.name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          ports:
+            - containerPort: {{ .Values.config.proxyPort }}
+              name: proxy
+            - containerPort: {{ .Values.config.wsPort }}
+              name: ws
+          hostNetwork: true    
+          securityContext:
+            privileged: true      
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.name }}-config-map
+          livenessProbe:
+            httpGet:
+              path: /status
+              port: {{ .Values.config.wsPort }}
+            initialDelaySeconds: 3
+            periodSeconds: 3
