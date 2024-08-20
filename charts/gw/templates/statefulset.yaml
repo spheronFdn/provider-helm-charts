@@ -73,7 +73,7 @@ spec:
               containerPort: {{ .Values.wsport }}
               protocol: TCP
             - name: tunnel
-              containerPort: {{ .Values.tunnel }}
+              containerPort: {{ .Values.tunnelport }}
               protocol: TCP
 
           volumeMounts:
