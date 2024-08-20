@@ -10,6 +10,8 @@ image:
 apiport: 8553
 wsport: 8554
 tunnelport: 8555
+tunnelportStart: 20000
+tunnelportEnd: 20100
 from:
 key:
 keysecret:

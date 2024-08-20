@@ -33,6 +33,11 @@ spec:
           env:
             - name: SPHERON_API_PORT
               value: "{{ .Values.apiport}}"
+
+            - name: PROXY_PORT_START
+              value: "{{ .Values.tunnelportStart }}"
+            - name: PROXY_PORT_END
+              value: "{{ .Values.tunnelportEnd }}"  
             - name: SPHERON_DEBUG
               value: "{{ $.Values.debug }}"
             - name: AP_YES
