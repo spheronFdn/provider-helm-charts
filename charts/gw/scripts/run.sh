@@ -18,6 +18,7 @@ exec provider-services run \
     --from=$SPHERON_FROM \
     --home=$SPHERON_HOME \
     --key-secret=$SPHERON_KEY_SECRET \
+    --wsport=$SPHERON_WS_PORT \
     --gateway-listen-address=0.0.0.0:$SPHERON_API_PORT \
     --bid-price-strategy=$SPHERON_BID_PRICE_STRATEGY \
     --bid-price-script-path=$SPHERON_BID_PRICE_SCRIPT_PATH \

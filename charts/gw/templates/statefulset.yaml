@@ -32,8 +32,9 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
             - name: SPHERON_API_PORT
-              value: "{{ .Values.apiport}}"
-
+              value: "{{ .Values.apiport }}"
+            - name: SPHERON_WS_PORT
+              value: "{{ .Values.wsport }}"
             - name: PROXY_PORT_START
               value: "{{ .Values.tunnelportStart }}"
             - name: PROXY_PORT_END
