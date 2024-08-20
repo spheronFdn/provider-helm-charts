@@ -31,6 +31,8 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
+            - name: SPHERON_API_PORT
+              value: "{{ .Values.apiport}}"
             - name: SPHERON_DEBUG
               value: "{{ $.Values.debug }}"
             - name: AP_YES
