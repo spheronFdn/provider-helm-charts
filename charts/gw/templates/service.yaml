@@ -25,7 +25,7 @@ spec:
       port: {{ .Values.tunnelport }}
       targetPort: tunnel
     # Expose range of ports from 20000 to 30000
-   {{- range $i, $port := until 10000 }}
+   {{- range $i, $port := until 5000 }}
     - name: port-{{ add $port 20000 }}
       protocol: TCP
       port: {{ add $port 20000 }}

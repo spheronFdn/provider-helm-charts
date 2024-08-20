@@ -13,7 +13,6 @@ type bc || exit 1
 echo "wallet: $SPHERON_FROM"
 echo "home: $SPHERON_HOME"
 echo "secret: $SPHERON_KEY_SECRET" ## TODO: Remove this not good for data compliance
-env
 
 exec provider-services run \
     --from=$SPHERON_FROM \
