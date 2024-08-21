@@ -9,7 +9,7 @@ image:
 
 apiport: 8543
 wsport: 8544
-tunnelport: 8555
+tunnelport: 8553
 tunnelportStart: 20000
 tunnelportEnd: 20100
 from:
