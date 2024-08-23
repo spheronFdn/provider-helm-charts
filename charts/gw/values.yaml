@@ -1,0 +1,71 @@
+# Default values for provider.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+image:
+  repository: spheronnetwork/gateway
+  pullPolicy: Always
+  tag: latest-amd64
+
+apiport: 8543
+wsport: 8544
+tunnelport: 8553
+tunnelportStart: 20000
+tunnelportEnd: 20100
+from:
+key:
+keysecret:
+domain:
+spheronHome: "/spheron-key"
+home: "/root/.spheron"
+
+bidpricestrategy: "shellScript"
+# If you plan to use bid price script, then make sure to set bidpricescript variable to the base64 encoded contents of the script.
+# This will automatically switch SPHERON_BID_PRICE_STRATEGY from "scale" (default) to "shellScript".
+# Sample scripts can be found under charts/spheron-provider/scripts/ directory.
+# Example usage:
+# --set bidpricescript="$(cat ./charts/spheron-provider/scripts/price_script_generic.sh | openssl base64 -A)"
+
+
+debug: "false"
+
+# Percentage of CPU overcommit
+overcommit_pct_cpu: 0
+# Percentage of memory overcommit
+overcommit_pct_mem: 0
+# Percentage of storage overcommit
+overcommit_pct_storage: 0
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name:
+
+podSecurityContext: {}
+
+securityContext: {}
+
+resources:
+  limits:
+    cpu: 2000m
+    memory: 1024Mi
+  requests:
+    cpu: 1000m
+    memory: 512Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+
+nodeSelector:
+  node-role.kubernetes.io/master: "true"
+
+tolerations: []
+
+affinity: {}
