@@ -24,13 +24,7 @@ spec:
       protocol: TCP
       port: {{ .Values.tunnelport }}
       targetPort: tunnel
-    # Expose range of ports from 20000 to 30000
-   {{- range $i, $port := until 500 }}
-    - name: port-{{ add $port 20000 }}
-      protocol: TCP
-      port: {{ add $port 20000 }}
-      targetPort: {{ add $port 20000 }}
-    {{- end }}
+  
   selector:
     app: {{ include "provider.fullname" . }}
     {{- include "provider.selectorLabels" . | nindent 4 }}

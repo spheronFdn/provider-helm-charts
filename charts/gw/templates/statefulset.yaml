@@ -23,6 +23,7 @@ spec:
         app: {{ include "provider.fullname" . }}
         {{- include "provider.selectorLabels" . | nindent 8 }}
     spec:
+      hostNetwork: true
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
@@ -85,11 +86,6 @@ spec:
             - name: tunnel
               containerPort: {{ .Values.tunnelport }}
               protocol: TCP
-            {{- range $i, $port := until 500 }}
-            - name: port-{{ add $port 20000 }}
-              protocol: TCP
-              containerPort: {{ add $port 20000 }}
-            {{- end }}  
 
           volumeMounts:
             - name: spheron-key
