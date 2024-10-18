@@ -86,7 +86,17 @@ spec:
             - name: tunnel
               containerPort: {{ .Values.tunnelport }}
               protocol: TCP
-
+          livenessProbe:
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - curl --insecure https://localhost:8543/status || exit 1
+            initialDelaySeconds: 15
+            periodSeconds: 15
+            failureThreshold: 3
+            successThreshold: 3
+            
           volumeMounts:
             - name: spheron-key
               mountPath: /spheron-key
