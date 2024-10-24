@@ -161,6 +161,16 @@ spec:
             - name: grpc
               containerPort: 8444
               protocol: TCP
+          livenessProbe:
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - curl --insecure https://localhost:8443/status || exit 1
+            initialDelaySeconds: 15
+            periodSeconds: 15
+            failureThreshold: 3
+            successThreshold: 1
 
           volumeMounts:
             - name: spheron-key
