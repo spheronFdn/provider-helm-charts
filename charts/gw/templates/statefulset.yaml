@@ -92,9 +92,9 @@ spec:
               - /bin/sh
               - -c
               - curl --insecure https://localhost:8543/status || exit 1
-            initialDelaySeconds: 15
-            periodSeconds: 15
-            failureThreshold: 3
+            initialDelaySeconds: 25
+            periodSeconds: 25
+            failureThreshold: 7
             successThreshold: 1
             
           volumeMounts:
