@@ -23,7 +23,7 @@ spec:
         app: {{ include "provider.fullname" . }}
         {{- include "provider.selectorLabels" . | nindent 8 }}
     spec:
-      {{- with .Values.imagePullSecrets }}
+      {{- with .Values.image.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -52,31 +52,31 @@ spec:
             ##
 
             - name: SPHERON_IP_OPERATOR
-              value: "{{ .Values.ipoperator }}"
+              value: "{{ .Values.ipOperator }}"
 
             ##
             # spheron-provider config
             ##
 
             - name: SPHERON_DEPLOYMENT_INGRESS_DOMAIN
-              value: "ingress.{{ .Values.domain }}"
+              value: "ingress.{{ .Values.provider.domain }}"
             - name: DEPLOYMENT_NETWORK_POLICIES_ENABLED
-              value: "{{ .Values.deploymentnetworkpoliciesenabled }}"
+              value: "{{ .Values.deployment.networkPolicies.enabled }}"
             - name: SPHERON_DEPLOYMENT_INGRESS_STATIC_HOSTS
               value: "true"
             - name: SPHERON_DEPLOYMENT_BLOCKED_HOSTNAMES
               value: ""
             - name: SPHERON_CLUSTER_NODE_PORT_QUANTITY
-              value: "{{ .Values.cluster_node_port_quantity }}"
+              value: "{{ .Values.clusterNodePortQuantity }}"
 
             # SPHERON_CLUSTER_PUBLIC_HOSTNAME need to stay as this makes to
             # 'spheron provider lease-status` under the forwarded_ports (nodePorts).
             # This is NOT used for connecting to K8s cluster itself (6443/tcp).
             # spheron-provider uses kubeconfig to connect to K8s cluster.
             - name: SPHERON_CLUSTER_PUBLIC_HOSTNAME
-              value: "{{ .Values.domain }}"
+              value: "{{ .Values.provider.domain }}"
             - name: SPHERON_BID_PRICE_STRATEGY
-              value: "{{ .Values.bidpricestrategy }}"
+              value: "{{ .Values.bidPrice.strategy }}"
 {{ if .Values.bidpricescript }}
             - name: SPHERON_BID_PRICE_SCRIPT_PATH
               value: "/scripts/price_script.sh"
@@ -126,33 +126,33 @@ spec:
               value: "{{ .Values.price_target_gpu_mappings }}"
 {{- end }}
             - name: SPHERON_BID_PRICE_CPU_SCALE
-              value: "{{ .Values.bidpricecpuscale }}"
+              value: "{{ .Values.bidPrice.scale.cpu }}"
             - name: SPHERON_BID_PRICE_MEMORY_SCALE
-              value: "{{ .Values.bidpricememoryscale }}"
+              value: "{{ .Values.bidPrice.scale.memory }}"
             - name: SPHERON_BID_PRICE_ENDPOINT_SCALE
-              value: "{{ .Values.bidpricendpointscale }}"
+              value: "{{ .Values.bidPrice.scale.endpoint }}"
             - name: SPHERON_BID_PRICE_STORAGE_SCALE
-              value: "{{ .Values.bidpricestoragescale }}"
+              value: "{{ .Values.bidPrice.scale.storage }}"
             - name: SPHERON_BID_PRICE_IP_SCALE
-              value: "{{ .Values.bidpriceipscale }}"
+              value: "{{ .Values.bidPrice.scale.ip }}"
             - name: SPHERON_OVERCOMMIT_PCT_CPU
-              value: "{{ .Values.overcommit_pct_cpu }}"
+              value: "{{ .Values.overcommit.pct.cpu }}"
             - name: SPHERON_OVERCOMMIT_PCT_MEM
-              value: "{{ .Values.overcommit_pct_mem }}"
+              value: "{{ .Values.overcommit.pct.mem }}"
             - name: SPHERON_OVERCOMMIT_PCT_STORAGE
-              value: "{{ .Values.overcommit_pct_storage }}"
+              value: "{{ .Values.overcommit.pct.storage }}"
             - name: SPHERON_CLUSTER_K8S
               value: "true"
             - name: KUBE_CONFIG
-              value: "{{ .Values.home }}/.kube/config"
+              value: "{{ .Values.provider.paths.home }}/.kube/config"
             - name: SPHERON_DEPLOYMENT_RUNTIME_CLASS
               value: "none"
             - name: SPHERON_FROM
-              value: "{{ .Values.from}}" 
+              value: "{{ .Values.provider.from}}"
             - name: SPHERON_KEY_SECRET
-              value: "{{ .Values.keysecret}}"    
+              value: "{{ .Values.provider.keySecret}}"
             - name: SPHERON_HOME
-              value: "{{ .Values.spheronHome}}"                             
+              value: "{{ .Values.provider.paths.spheronHome}}"
 
           ports:
             - name: api
@@ -182,7 +182,7 @@ spec:
             - name: provider-config-volume
               mountPath: /config
             - name: home
-              mountPath: "{{ .Values.home }}"
+              mountPath: "{{ .Values.provider.paths.home }}"
       volumes:
         - name: spheron-key
           hostPath:
