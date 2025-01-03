@@ -74,7 +74,7 @@ spec:
             # This is NOT used for connecting to K8s cluster itself (6443/tcp).
             # spheron-provider uses kubeconfig to connect to K8s cluster.
             - name: SPHERON_CLUSTER_PUBLIC_HOSTNAME
-              value: "provider.{{ .Values.domain }}"
+              value: "{{ .Values.domain }}"
             - name: SPHERON_BID_PRICE_STRATEGY
               value: "{{ .Values.bidpricestrategy }}"
 {{ if .Values.bidpricescript }}
