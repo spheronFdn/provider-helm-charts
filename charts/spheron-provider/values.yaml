@@ -1,53 +1,55 @@
+# Provider Configuration
 # Default values for provider.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
 
 image:
   repository: spheronnetwork/devnet-provider
   pullPolicy: Always
   tag: latest-amd64
+  imagePullSecrets: []
 
-from:
-key:
-keysecret:
-domain:
-spheronHome: "/spheron-key"
-home: "/root/.spheron"
+debug: "false"
 
-# Your provider contact details we submit to the chain
-email:
-website:
+provider:
+  domain: ""  # Required: Provider domain name
+  from: ""  # Required: Provider address
+  key: ""   # Required: Provider key
+  keySecret: ""  # Required: Key secret
+  providerContact:
+    email: ""     # Required: Contact email
+    website: ""   # Optional: Provider website
+  paths:
+    spheronHome: "/spheron-key"
+    home: "/root/.spheron"
 
 # If you plan to use bid price script, then make sure to set bidpricescript variable to the base64 encoded contents of the script.
 # This will automatically switch SPHERON_BID_PRICE_STRATEGY from "scale" (default) to "shellScript".
 # Sample scripts can be found under charts/spheron-provider/scripts/ directory.
 # Example usage:
 # --set bidpricescript="$(cat ./charts/spheron-provider/scripts/price_script_generic.sh | openssl base64 -A)"
-bidpricecpuscale: "0.004"
-bidpricememoryscale: "0.0016"
-bidpriceendpointscale: "1"
-# set pricing for leased IP
-# 1 IP would cost ((1*60*429903)/10^6)*0.194 = $5/month (if 1 AKT = $0.194; and 429903 blocks a month)
-bidpriceipscale: "60"
-# set storage pricing for your StorageClass you are using
-# here is an example for beta2 StorageClass:
-bidpricestoragescale: "0.00016,beta2=0.00016"
-bidpricestrategy: "randomRange"
-deploymentnetworkpoliciesenabled: "false"
-cluster_node_port_quantity: "2500"
+bidPrice:
+  strategy: "randomRange"
+  scale:
+    cpu: "0.004"
+    memory: "0.0016"
+    endpoint: "1"
+    ip: "60" # set pricing for leased IP; 1 IP would cost ((1*60*429903)/10^6)*0.194 = $5/month (if 1 AKT = $0.194; and 429903 blocks a month)
+    storage: "0.00016,beta2=0.00016" # set storage pricing for your StorageClass you are using; here is an example for beta2 StorageClass:
 
-ipoperator: false
 
-debug: "false"
+deployment:
+  networkPolicies:
+    enabled: "false"
 
-# Percentage of CPU overcommit
-overcommit_pct_cpu: 0
-# Percentage of memory overcommit
-overcommit_pct_mem: 0
-# Percentage of storage overcommit
-overcommit_pct_storage: 0
+clusterNodePortQuantity: "2500"
 
-imagePullSecrets: []
+ipOperator: false
+
+overcommit:
+  pct:
+    cpu: 0 # Percentage of CPU overcommit
+    mem: 0 # Percentage of memory overcommit
+    storage: 0 # Percentage of storage overcommit
+
 nameOverride: ""
 fullnameOverride: ""
 
