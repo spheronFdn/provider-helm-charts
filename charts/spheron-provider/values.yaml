@@ -77,7 +77,7 @@ autoscaling:
   targetCPUUtilizationPercentage: 80
 
 nodeSelector:
-  node-role.kubernetes.io/master: "true"
+  node-role.kubernetes.io/control-plane: "true"
 
 tolerations: []
 
