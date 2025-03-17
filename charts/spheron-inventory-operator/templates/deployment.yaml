@@ -32,12 +32,7 @@ spec:
       containers:
         - name: operator-inventory
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          args:
-            - "provider-services"
-            - "operator"
-            - "inventory"
-            - "--provider-configs-url"
-            - "{{ .Values.config.url }}"
+          command: ["/bin/bash", "/scripts/run.sh", "{{ .Values.config.url }}"]
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: AP_CONFIG
@@ -67,7 +62,13 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /spheron
+            - name: scripts
+              mountPath: /scripts  
       volumes:
         - name: config
           configMap:
             name: operator-inventory
+        - name: scripts
+          configMap:
+            name: operator-inventory-scripts
+            defaultMode: 0744    

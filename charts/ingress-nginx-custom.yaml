@@ -1,0 +1,21 @@
+controller:
+  service:
+    type: ClusterIP
+  ingressClassResource:
+    name: "spheron-ingress-class"
+  kind: DaemonSet
+  hostPort:
+    enabled: true
+  admissionWebhooks:
+    port: 7443
+  config:
+    allow-snippet-annotations: false
+    compute-full-forwarded-for: true
+    proxy-buffer-size: "16k"
+  metrics:
+    enabled: true
+  extraArgs:
+    enable-ssl-passthrough: true
+tcp:
+  "8443": "spheron-services/spheron-provider:8443"
+  "8444": "spheron-services/spheron-provider:8444"
