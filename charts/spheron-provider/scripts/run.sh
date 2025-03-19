@@ -35,6 +35,7 @@ exec provider-services run \
     --cluster-node-port-quantity=$SPHERON_CLUSTER_NODE_PORT_QUANTITY \
     --cluster-public-hostname=$SPHERON_CLUSTER_PUBLIC_HOSTNAME \
     --deployment-runtime-class=$SPHERON_DEPLOYMENT_RUNTIME_CLASS \
+    --imageName=unstable-devnet-provider \
     | while read line; do
     echo "$line"
     if [[ "$line" == *"account sequence mismatch"* ]]; then
