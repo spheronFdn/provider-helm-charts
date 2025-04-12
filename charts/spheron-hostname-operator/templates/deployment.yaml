@@ -27,6 +27,10 @@ spec:
         app.kubernetes.io/part-of: provider
     spec:
       serviceAccountName: operator-hostname
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: operator-hostname
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
